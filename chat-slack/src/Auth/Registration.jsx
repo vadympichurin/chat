@@ -11,6 +11,7 @@ import {
   GridColumn
 } from "semantic-ui-react";
 import firebase from "../firebase";
+import md5 from 'md5';
 
 class Registration extends Component {
   state = {
@@ -18,7 +19,9 @@ class Registration extends Component {
     email: "",
     password: "",
     passwordConfirm: "",
-    errors: []
+    errors: [],
+    loading: false,
+    usersRef: firebase.database().ref('users')
   };
 
   handlerChange = e => {
@@ -59,6 +62,13 @@ class Registration extends Component {
         }
     //    return this.isFormEmpty() && this.isPasswordValid()
     }  
+
+    saveUser = createdUser => {
+        return this.state.usersRef.child(createdUser.user.uid).set({
+            name: createdUser.user.displayName,
+            avatar: createdUser.user.photoURL,
+        })
+    }
   
   handleSubmit = e => {
     e.preventDefault();
@@ -68,6 +78,19 @@ class Registration extends Component {
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then(createdUser => {
         console.log(createdUser);
+        createdUser.user.updateProfile({
+            displayName: this.state.username,
+            photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`,
+        })
+        .then(() => {
+            this.saveUser(createdUser).then(() => console.log('user saved'))
+        })
+        // .catch(err => ({
+        //     console.log(err)
+        //     this.setState({errors: this.state})
+
+
+        // }))
       })
       .catch(err => {
         console.log(err)
