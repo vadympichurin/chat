@@ -69,11 +69,19 @@ class Registration extends Component {
       .then(createdUser => {
         console.log(createdUser);
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err)
+        this.setState({errors: this.state.errors.concat(err)})
+      })
   };
 }
 
-  render({errors}) {
+handleInput = (errors, inputName) => {
+    return errors.some(el => el.message.toLowerCase().includes(inputName)) ? "error" : ''
+}
+
+  render() {
+      let {errors, username, email, password, passwordConfirm} = this.state;
     return (
       <Grid textAlign="center" verticalAlign="middle" className="app">
         <GridColumn
@@ -88,7 +96,7 @@ class Registration extends Component {
           <Form size="large" onSubmit={this.handleSubmit}>
             <Segment stacked>
 
-              <Form.Input
+              <Form.Input 
                 fluid
                 name="username"
                 icon="user"
@@ -97,6 +105,7 @@ class Registration extends Component {
                 type="text"
                 onChange={this.handlerChange}
                 value={this.state.username}
+                className={this.handleInput(errors, 'username')}
               />
 
               <Form.Input
@@ -108,6 +117,7 @@ class Registration extends Component {
                 type="email"
                 onChange={this.handlerChange}
                 value={this.state.email}
+                className={this.handleInput(errors, 'email')}
               />
 
               <Form.Input
@@ -119,6 +129,7 @@ class Registration extends Component {
                 type="password"
                 onChange={this.handlerChange}
                 value={this.state.password}
+                className={this.handleInput(errors, 'password')}
               />
 
               <Form.Input
@@ -130,6 +141,7 @@ class Registration extends Component {
                 type="password"
                 onChange={this.handlerChange}
                 value={this.state.passwordConfirm}
+                className={this.handleInput(errors, 'password')}
               />
 
               <Button color="orange" fluid size="large">
