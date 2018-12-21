@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { Switch, Route, withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import { setUser } from '../redux/actions/setUserAction';
 import App from "../App";
 import Login from "../Auth/Login";
 import Registration from "../Auth/Registration";
@@ -10,6 +12,7 @@ componentDidMount(){
     firebase.auth().onAuthStateChanged(user => {
         if(user) {
             console.log(user);
+            this.props.setUser(user);
             this.props.history.push('/');
         }
     })
@@ -28,4 +31,13 @@ componentDidMount(){
     }
 }
 
-export default withRouter(Root);
+function MDTP (dispatch) {
+    return {
+        setUser: function(user){
+            dispatch(setUser(user))
+        },
+
+    }
+}
+
+export default withRouter(connect(null,MDTP)(Root));
