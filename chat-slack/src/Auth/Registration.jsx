@@ -85,12 +85,10 @@ class Registration extends Component {
         .then(() => {
             this.saveUser(createdUser).then(() => console.log('user saved'))
         })
-        // .catch(err => ({
-        //     console.log(err)
-        //     this.setState({errors: this.state})
-
-
-        // }))
+        .catch(err => {
+            console.error(err)
+            this.setState({errors: this.state.errors.concat(err), loading: false})
+        })
       })
       .catch(err => {
         console.log(err)
