@@ -6,6 +6,7 @@ import App from "../App";
 import Login from "../Auth/Login";
 import Registration from "../Auth/Registration";
 import firebase from "../firebase";
+import Spiner from '../spiner/Spiner';
 
 class Root extends Component {
 componentDidMount(){
@@ -21,13 +22,19 @@ componentDidMount(){
 
 
     render () {
-        return (
+        return this.props.isLoading ? <Spiner/> : (
             <Switch>
                 <Route exact path="/" component={App}/>
                 <Route exact path="/login" component={Login}/>
                 <Route exact path="/registration" component={Registration}/>
             </Switch>
-        )
+         )
+    }
+}
+
+function MSTP (state) {
+    return {
+        isLoading: state.user.isLoading,
     }
 }
 
@@ -40,4 +47,4 @@ function MDTP (dispatch) {
     }
 }
 
-export default withRouter(connect(null,MDTP)(Root));
+export default withRouter(connect(MSTP,MDTP)(Root));
