@@ -84,7 +84,7 @@ class Login extends Component {
           }}
         >
           <Header as="h2" icon color="green" textAlign="center">
-            <Icon name="comment alternate" color="green" />
+            <Icon name="user secret" color="green" />
             Register form for Chat
           </Header>
           <Form size="large" onSubmit={this.handleSubmit}>
