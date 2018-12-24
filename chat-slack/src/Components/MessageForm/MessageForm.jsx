@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Segment, Input, Button } from "semantic-ui-react";
 import firebase from '../../firebase';
 import { connect } from 'react-redux';
+import FileModals from "../FileModals/FileModals";
 
 class MessageForm extends Component {
 
@@ -9,7 +10,14 @@ class MessageForm extends Component {
         message: '',
         loading: false,
         errors: '',
+        modalState: false,
     }
+
+    togleModal = () => {
+        this.setState(prev => ({
+          modalState: !prev.modalState
+        }));
+      };
 
     handleChange = e => {
         this.setState({
@@ -80,8 +88,10 @@ class MessageForm extends Component {
             content="Upload media"
             labelPosition="right"
             icon="cloud upload"
+            onClick={this.togleModal}
           />
         </Button.Group>
+        <FileModals togleModal={this.togleModal} modalState={this.state.modalState} />
       </Segment>
     );
   }
