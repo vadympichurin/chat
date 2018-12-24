@@ -50,7 +50,6 @@ class UserPanel extends Component {
 function MSTP (state){
     return {
         currentUser: state.user.currentUser,
-
     }
 }
 
