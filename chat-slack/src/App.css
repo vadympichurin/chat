@@ -18,6 +18,11 @@
   color: white;
 }
 
+.messages {
+  height: 380px;
+  overflow-y: scroll;
+}
+
 .App-link {
   color: #61dafb;
 }
