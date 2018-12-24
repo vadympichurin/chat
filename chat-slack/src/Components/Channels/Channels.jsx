@@ -12,6 +12,21 @@ class Channels extends Component {
     channelsRef: firebase.database().ref('channels'),
   };
 
+  componentDidMount () {
+    this.addListeners();
+  }
+
+  addListeners = () => {
+    let loadedChannels = [];
+    this.state.channelsRef.on('child_added', snap => {
+      loadedChannels.push(snap.val())
+      console.log(loadedChannels);
+      this.setState({
+        channels: loadedChannels,
+      })
+    })
+  }
+
   togleModal = () => {
     this.setState(prev => ({
       modalState: !prev.modalState
@@ -58,10 +73,8 @@ class Channels extends Component {
     .catch(err => console.log(err))
   }
 
-  
 
-
-
+  // ========================================================================================
   render() {
     const { channels, modalState, channelName, channelDescription } = this.state;
     return (
@@ -73,6 +86,11 @@ class Channels extends Component {
             </span>{" "}
             ({channels.length})<Icon onClick={this.togleModal} name="add" />
           </Menu.Item>
+          {channels.length > 0 && channels.map(channel => (
+            <Menu.Item key={channel.id} name={channel.name} style={{opacity: 0.7}} >
+            # {channel.name}
+            </Menu.Item>
+          ))}
         </Menu.Menu>
 
         <Modal open={modalState} onClose={this.togleModal} closeIcon>
