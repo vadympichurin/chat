@@ -1,20 +1,15 @@
 import React, { Component } from "react";
-import {
-  Menu,
-  Icon,
-  Modal,
-  Header,
-  Button,
-  Input,
-  Form
-} from "semantic-ui-react";
+import {Menu, Icon, Modal, Header, Button, Input, Form } from "semantic-ui-react";
+import firebase from '../../firebase';
+import { connect } from 'react-redux';
 
 class Channels extends Component {
   state = {
     channels: [],
     channelName: "",
     channelDescription: "",
-    modalState: false
+    modalState: false,
+    channelsRef: firebase.database().ref('channels'),
   };
 
   togleModal = () => {
@@ -31,15 +26,39 @@ class Channels extends Component {
 
   isFormFilled = ({channelName, channelDescription}) => channelName && channelDescription;
 
-  addChannel = () => {
+  addChannel = (e) => {
+    e.preventDefault();
     if(this.isFormFilled(this.state)){
-    this.setState(prev => ({
-      channels: [...prev.channels, {name: this.state.channelName, description: this.state.channelDescription}],
-      channelName: '',
-      channelDescription: ''
-    }))}
-    this.togleModal();
+    this.addChannelsToDatabase();
+    }
   }
+
+  addChannelsToDatabase = () => {
+    const {channelsRef, channelName, channelDescription} = this.state;
+    const key = channelsRef.push().key;
+    const newChannel = {
+      id: key,
+      name: channelName,
+      details: channelDescription,
+      createdBy: {
+        name: this.props.user.displayName,
+        avatar: this.props.user.photoURL,
+      }
+    }
+    console.log(newChannel)
+    channelsRef.child(key)
+    .update(newChannel)
+    .then(() => {
+      this.setState({
+        channelName: '', channelDescription: '',
+      })
+      this.togleModal();
+      console.log('channel added');
+    })
+    .catch(err => console.log(err))
+  }
+
+  
 
 
 
@@ -60,7 +79,7 @@ class Channels extends Component {
           <Header icon="wechat" content="Add channel" />
           <Modal.Content>
 
-            <Form>
+            <Form onSubmit={this.addChannel}>
               <Form.Field>
                 <Input
                   fluid
@@ -98,4 +117,10 @@ class Channels extends Component {
   }
 }
 
-export default Channels;
+function MSTP (state) {
+  return {
+    user: state.user.currentUser,
+  }
+}
+
+export default connect(MSTP)(Channels);
