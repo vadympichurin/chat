@@ -10,8 +10,6 @@ class SidePanel extends Component {
             <UserPanel/>
             <Channels/>
             </Menu>
-            
-
         )
     }
 }
