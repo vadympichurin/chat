@@ -86,9 +86,9 @@ class Message extends Component {
 
           {/*------------this checking------------------  */}
 
-          {filterMessages.length  === 0 && messages.length > 0 && messages.map(el => <SingleMessage key={el.time} message={el} user={el.user}/> )}
-
           {filterMessages.length > 0 && filterMessages.map(el => <SingleMessage key={el.time} message={el} user={el.user}/>)}
+
+          {filterMessages.length  === 0 && messages.length > 0 && messages.map(el => <SingleMessage key={el.time} message={el} user={el.user}/> )}
 
         {/* ------- or this checking ---------------------------- */}
 
