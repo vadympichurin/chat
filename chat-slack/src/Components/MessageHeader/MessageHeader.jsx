@@ -19,6 +19,7 @@ class MessageHeader extends Component {
             icon="search"
             nema="searchTerm"
             placeholder="Searh..."
+            onChange={this.props.addSearchMessage}
           />
         </Header>
       </Segment>

@@ -12,6 +12,8 @@ class Message extends Component {
     messages: [],
     loading: true,
     countUser: '',
+    filterMessages: [],
+    searchTerm: '',
   };
 
   componentDidMount() {
@@ -48,14 +50,56 @@ class Message extends Component {
     })
   }
 
+  searchMessage = () => {
+    let filteredMessages = this.state.messages.filter(el => {
+      if(el.content) {
+       return el.content.includes(this.state.searchTerm)
+      }
+    });
+    this.setState({
+      filterMessages: filteredMessages,
+    })
+    }
+  
+
+  addSearchMessage = async (e) => {
+    await this.setState({
+      searchTerm: e.target.value,
+    })
+    this.searchMessage()
+  }
+
+  
+
+
+
+
+  // =========================================================================================================
+
   render() {
-    const { messagesRef, messages } = this.state;
+    const { messagesRef, messages, filterMessages } = this.state;
     return (
       <React.Fragment>
-        <MessageHeader countUser={this.state.countUser} />
+        <MessageHeader countUser={this.state.countUser} addSearchMessage={this.addSearchMessage}/>
         <Segment>
           <Comment.Group className="messages">
-          {messages.length > 0 && messages.map(el => <SingleMessage key={el.time} message={el} user={el.user}/> )}
+
+          {/*------------this checking------------------  */}
+
+          {filterMessages.length  === 0 && messages.length > 0 && messages.map(el => <SingleMessage key={el.time} message={el} user={el.user}/> )}
+
+          {filterMessages.length > 0 && filterMessages.map(el => <SingleMessage key={el.time} message={el} user={el.user}/>)}
+
+        {/* ------- or this checking ---------------------------- */}
+
+          {/* {
+            filterMessages.length !== 0 ? filterMessages.map(el => <SingleMessage key={el.time} message={el} user={el.user}/>) :
+          messages.length > 0 ? messages.map(el => <SingleMessage key={el.time} message={el} user={el.user}/> ) : null
+        } */}
+
+        {/* ------------------------------------------------------------------------- */}
+
+          
           </Comment.Group>
         </Segment>
 
