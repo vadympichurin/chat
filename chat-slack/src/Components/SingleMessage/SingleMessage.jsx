@@ -1,9 +1,11 @@
 import React from 'react';
-import { Comment } from 'semantic-ui-react';
+import { Comment, Image } from 'semantic-ui-react';
 import moment from 'moment';
 
 
 const isOwnMessage = (message, user) => message.user.id === user.id ? 'message_self' : '';
+
+const isImage = message => message.hasOwnProperty('image') && !message.hasOwnProperty('content');
 
 const timeFromNow = time => moment(time).fromNow();
 
@@ -18,9 +20,10 @@ const SingleMessage = ({message, user}) => {
             <Comment.Metadata>
                 {timeFromNow(message.time)}
             </Comment.Metadata>
-            <Comment.Text>
-                {message.content}
-            </Comment.Text>
+
+            {isImage(message) ? <Image src={message.image} className='message_image' />
+            : <Comment.Text> {message.content} </Comment.Text> }
+            
             </Comment.Content>
         </Comment>
     )

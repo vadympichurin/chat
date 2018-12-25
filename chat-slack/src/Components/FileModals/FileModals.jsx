@@ -1,21 +1,43 @@
 import React, {Component} from 'react';
 import { Modal, Input, Button, Icon } from 'semantic-ui-react';
+import mime from 'mime-types';
 
 class FileModals extends Component {
 
-    // state = {
-    //     modalState: false,
+    state = {
+        file: null,
+        correctType: ['image/jpg', 'image/jpeg', 'image/png'],
+    }
+
+    addFile = e => {
+        const file = e.target.files[0];
+        if(file) {
+            this.setState({file});
+        }
+    }
+
+    sendFile = () => {
+        if(this.state.file !== null) {
+            if(this.isFileCorrectType(this.state.file.name)) {
+                const metadata = {
+                    contentType: mime.lookup(this.state.file.name)
+                };
+                this.props.uploadFile(this.state.file, metadata);
+                this.props.togleModal();
+                this.setState({
+                    file: null,
+                })
+            }
+        }
+    }
+
+    isFileCorrectType = fileName => this.state.correctType.includes(mime.lookup(fileName));
+
+    // uploadFile = (file, metadata) => {
+        
+    //     console.log(file, metadata);
     // }
 
-
-
-
-
-    // togleModal = () => {
-    //     this.setState(prev => ({
-    //       modalState: !prev.modalState
-    //     }));
-    //   };
 
     render() {
 
@@ -26,10 +48,10 @@ const { modalState, togleModal } = this.props;
         <Modal open={modalState} onClose={togleModal} >
           <Modal.Header>Select an image file </Modal.Header>
           <Modal.Content>
-              <Input fluid label='File types: jpg, png' name='file' type="file" />
+              <Input onChange={this.addFile} fluid label='File types: jpg, png' name='file' type="file" />
           </Modal.Content>
           <Modal.Actions>
-              <Button color="green" inverted>
+              <Button color="green" inverted onClick={this.sendFile}>
               <Icon name="checkmark" /> Send
               </Button>
               <Button color="red" inverted onClick={togleModal}>

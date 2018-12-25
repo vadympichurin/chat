@@ -3,6 +3,7 @@ import { Segment, Input, Button } from "semantic-ui-react";
 import firebase from '../../firebase';
 import { connect } from 'react-redux';
 import FileModals from "../FileModals/FileModals";
+import uuidv4 from 'uuid/v4';
 
 class MessageForm extends Component {
 
@@ -11,6 +12,8 @@ class MessageForm extends Component {
         loading: false,
         errors: '',
         modalState: false,
+        uploadTask: null,
+        storageRef: firebase.storage().ref(),
     }
 
     togleModal = () => {
@@ -25,9 +28,9 @@ class MessageForm extends Component {
         })
     }
 
-    createMessage = () => {
+    createMessage = (url = null) => {
         const message = {
-            content: this.state.message,
+            // content: this.state.message,
             time: firebase.database.ServerValue.TIMESTAMP,
             user: {
                 id: this.props.currentUser.uid,
@@ -35,9 +38,12 @@ class MessageForm extends Component {
                 avatar: this.props.currentUser.photoURL,
             }
         }
-        console.log(message)
+        if(url !== null) {
+            message['image'] = url
+        } else {
+            message['content'] = this.state.message;
+        }
         return message;
-        
     }
 
     sendMessage = () => {
@@ -62,6 +68,41 @@ class MessageForm extends Component {
         }
     }
 
+    uploadFile = (file, metadata) => {
+        const pathToUpload = this.props.currentChannel.id;
+        const ref = this.props.messagesRef;
+        const filePath = `chat/public/image${uuidv4()}.jpg`;
+        this.setState({
+            uploadTask: this.state.storageRef.child(filePath).put(file, metadata)
+        },
+        () => {
+            this.state.uploadTask.on(
+                "state_changed",
+                () => {
+                    this.state.uploadTask.snapshot.ref
+                        .getDownloadURL()
+                        .then(downloadURL => {
+                            this.sendFileMessage(downloadURL, ref, pathToUpload);
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                }
+            )
+        })
+    }
+
+    sendFileMessage = (url, ref, path) => {
+        ref.child(path)
+        .push()
+        .set(this.createMessage(url))
+        .catch(err => {
+            console.log(err);
+        })
+    }
+
+
+    // ===================================================================================
   render() {
     return (
       <Segment className="message_form">
@@ -91,7 +132,7 @@ class MessageForm extends Component {
             onClick={this.togleModal}
           />
         </Button.Group>
-        <FileModals togleModal={this.togleModal} modalState={this.state.modalState} />
+        <FileModals togleModal={this.togleModal} modalState={this.state.modalState} uploadFile={this.uploadFile}/>
       </Segment>
     );
   }
