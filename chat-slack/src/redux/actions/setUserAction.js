@@ -20,3 +20,11 @@ export const setPrivateChannel = (isPrivateChannel) => ({
     type: actionTypes.SET_PRIVATE_CHANNEL,
     data: isPrivateChannel,
 })
+
+export const setColorsAction = ( primaryColor, secondaryColor) => ({
+    type: actionTypes.SET_COLOR,
+    data: {
+        primaryColor,
+        secondaryColor,
+    }
+})

@@ -27,24 +27,48 @@ class Message extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps.channel && this.props.channel) {
-      if(prevProps.channel.name !== this.props.channel.name) {
-        this.addListeners(this.props.channel.id)
+    if(prevProps.currentChannel && this.props.currentChannel) {
+      if(prevProps.currentChannel.name !== this.props.currentChannel.name) {
+        this.addListeners(this.props.currentChannel.id)
       }
     }
   }
 
   addListeners = channelID => {
     let loadedMessages = [];
-    this.state.messagesRef.child(channelID).on("child_added", snap => {
-      loadedMessages.push(snap.val());
-      this.setState({
-        messages: loadedMessages,
-        loading: false
-      })
-      this.countUniqUser(loadedMessages)
+    let ref = this.state.messagesRef.child(channelID);
+
+
+    ref.once("value").then((snapshot) => {
+      // -------------------------------==-=-==-
+      if(snapshot.exists()) {
+        ref.on('child_added', snap => {
+          loadedMessages.push(snap.val())
+          this.setState({
+            messages: loadedMessages,
+            loading: false,
+          })
+          this.countUniqUser(loadedMessages)
+        })
+      } else {
+        this.setState({
+          messages: [],
+          loading: false,
+        })
+        this.countUniqUser(this.state.messages)
+      }
     })
   }
+
+  //   this.state.messagesRef.child(channelID).on("child_added", snap => {
+  //     loadedMessages.push(snap.val());
+  //     this.setState({
+  //       messages: loadedMessages,
+  //       loading: false
+  //     })
+  //     this.countUniqUser(loadedMessages)
+  //   })
+  // }
 
   countUniqUser = messages => {
     const iniqueUsers = messages.reduce((acc, el) => {
