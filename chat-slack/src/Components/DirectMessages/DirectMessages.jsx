@@ -92,17 +92,17 @@ class DirectMessages extends Component {
         <Menu.Item>
           <span>
             <Icon name="mail" /> DIRECT MESSAGES
-          </span>{" "}
+          </span>({users.length})
           ({users.length})
         </Menu.Item>
 
         {users.length > 0 && users.map(el => (
           <Menu.Item
             key={el.uid}
-            onClick={() => console.log(el)}
+            onClick={() => this.changeChannel(el)}
             style={{ opacity: 0.7, fontStyle: "italic" }}
           >
-            <Icon name="circle" /> @ {el.name}
+            <Icon name="circle" color={el.status === "online" ? 'green' : 'red'}/> @ {el.name}
           </Menu.Item>
         ))}
       </Menu.Menu>
@@ -116,4 +116,6 @@ function MSTP(state) {
   };
 }
 
-export default connect(MSTP)(DirectMessages);
+
+
+export default connect(MSTP, {setCurrentChannel, setPrivateChannel})(DirectMessages);

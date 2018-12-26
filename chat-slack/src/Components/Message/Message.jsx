@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 import SingleMessage from '../SingleMessage/SingleMessage';
 
 class Message extends Component {
+
   state = {
     messagesRef: firebase.database().ref("messages"),
     messages: [],
@@ -23,6 +24,14 @@ class Message extends Component {
         this.addListeners(currentChannel.id);
       }
     }, 1000);
+  }
+
+  componentDidUpdate(prevProps) {
+    if(prevProps.channel && this.props.channel) {
+      if(prevProps.channel.name !== this.props.channel.name) {
+        this.addListeners(this.props.channel.id)
+      }
+    }
   }
 
   addListeners = channelID => {
