@@ -2,12 +2,15 @@ import React, { Component } from "react";
 import { Menu, Icon } from "semantic-ui-react";
 import firebase from "../../firebase";
 import { connect } from "react-redux";
+import { setCurrentChannel, setPrivateChannel } from '../../redux/actions/setUserAction';
 
 class DirectMessages extends Component {
   state = {
     users: [],
-    usersRef: firebase.database().ref("users")
-  };
+    usersRef: firebase.database().ref("users"),
+    connectedRef: firebase.database().ref('.info/connected'),
+    onlineRef: firebase.database().ref('onlineUsers'),
+  }
 
   componentDidMount() {
     if (this.props.user) {
@@ -27,8 +30,55 @@ class DirectMessages extends Component {
           users: loadedUser
         });
       }
-    });
+    })
+
+    this.state.connectedRef.on('value', snap => {
+        if(snap.val()) {
+            const ref = this.state.onlineRef.child(id);
+            ref.set(true);
+            ref.onDisconnect().remove(err => {
+                if(err !== null) {
+                    console.log(err);
+                }
+            })
+        }
+    })
+
+    this.state.onlineRef.on('child_added', snap => {
+        if(id !== snap.key) {
+            this.setUserStatus(snap.key);
+        }
+    })
+
+    this.state.onlineRef.on('child_removed', snap => {
+        if(id !== snap.key) {
+            this.setUserStatus(snap.key, false);
+        }
+    })
   };
+
+  setUserStatus = (id, status = true) => {
+      const updateUsers = this.state.users.map(el => {
+          if(el.uid === id) {
+              el.status = `${status ? "online" : "offline"}`
+          }
+      })
+      this.setState({
+          users: updateUsers,
+      })
+  }
+
+  changeChannel = user => {
+      const channelID = this.getChannelId(user.uid);
+      const channelData = {
+          id: channelID,
+          name: user.name,
+      }
+      this.props.setCurrentChannel(channelData);
+      this.props.setPrivateChannel(true);
+  };
+
+  getChannelId 
 
   // ===============================================================================
   render() {
@@ -43,7 +93,7 @@ class DirectMessages extends Component {
           ({users.length})
         </Menu.Item>
 
-        {users.map(el => (
+        {users.length > 0 && users.map(el => (
           <Menu.Item
             key={el.uid}
             onClick={() => console.log(el)}

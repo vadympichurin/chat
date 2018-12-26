@@ -16,3 +16,7 @@ export const setCurrentChannel = (channel) => ({
     data: channel,
 })
 
+export const setPrivateChannel = (isPrivateChannel) => ({
+    type: actionTypes.SET_PRIVATE_CHANNEL,
+    data: isPrivateChannel,
+})
